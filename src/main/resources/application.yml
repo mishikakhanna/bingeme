@@ -1,0 +1,30 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bingeme
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+app:
+  jwt:
+    secret: your_jwt_secret_key_here_make_it_long_and_secure_in_production
+    expiration: 86400000 # 24 hours in milliseconds
+  cors:
+    allowed-origins: http://localhost:5173
+  aws:
+    access-key: your_aws_access_key
+    secret-key: your_aws_secret_key
+    region: us-east-1
+    s3:
+      bucket: your-bucket-name
