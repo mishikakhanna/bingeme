@@ -1,6 +1,6 @@
 import type { LoginCredentials, RegisterCredentials, User } from '../types/auth';
 
-const API_URL = 'http://localhost:8080/api';
+const API_BASE_URL = 'http://localhost:8080/api';
 
 class ApiService {
   private token: string | null = null;
@@ -22,38 +22,44 @@ class ApiService {
     localStorage.removeItem('auth_token');
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-
-    if (this.getToken()) {
-      headers['Authorization'] = `Bearer ${this.getToken()}`;
-    }
-
-    const response = await fetch(`${API_URL}${endpoint}`, {
-      ...options,
-      headers: {
-        ...headers,
-        ...options.headers,
-      },
-    });
+  async request<T>(url: string, options: RequestInit): Promise<T> {
+    const response = await fetch(url, options);
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'An error occurred');
+      const message = `An error has occurred: ${response.status} ${response.statusText}`;
+      console.error(message);
+      throw new Error(message);
     }
 
-    return response.json();
+    try {
+      const data: T = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      throw new Error('Error parsing response JSON.');
+    }
   }
 
   async login(credentials: LoginCredentials): Promise<{ token: string; user: User }> {
-    const data = await this.request<{ token: string; user: User }>('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(credentials),
-    });
-    this.setToken(data.token);
-    return data;
+    try {
+      const endpoint = `${API_BASE_URL}/auth/login`;
+      console.log('Login endpoint:', endpoint); // Log the full endpoint URL
+
+      const data = await this.request<{ token: string; user: User }>(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      this.setToken(data.token);
+
+      return data;
+    } catch (error) {
+      console.error('Login request failed:', error);
+      throw new Error('Login failed.');
+    }
   }
 
   async register(credentials: RegisterCredentials): Promise<{ token: string; user: User }> {
@@ -76,7 +82,7 @@ class ApiService {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await fetch(`${API_URL}/users/profile-picture`, {
+    const response = await fetch(`${API_BASE_URL}/users/profile-picture`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${this.getToken()}`,

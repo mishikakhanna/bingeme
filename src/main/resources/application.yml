@@ -1,16 +1,14 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/bingeme
-    username: postgres
-    password: postgres
+    url: jdbc:h2:file:./data/testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
   jpa:
     hibernate:
       ddl-auto: update
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
     show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
   servlet:
     multipart:
       max-file-size: 10MB
@@ -18,8 +16,8 @@ spring:
 
 app:
   jwt:
-    secret: your_jwt_secret_key_here_make_it_long_and_secure_in_production
-    expiration: 86400000 # 24 hours in milliseconds
+
+    # 24 hours in milliseconds
   cors:
     allowed-origins: http://localhost:5173
   aws:

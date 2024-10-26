@@ -1,63 +1,42 @@
 package com.bingeme.controller;
 
-import com.bingeme.dto.AuthResponse;
 import com.bingeme.dto.LoginRequest;
 import com.bingeme.dto.RegisterRequest;
-import com.bingeme.dto.UserDTO;
-import com.bingeme.model.User;
-import com.bingeme.security.JwtTokenProvider;
-import com.bingeme.service.UserService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@RequiredArgsConstructor
+@CrossOrigin(origins = "http://localhost:5173")
+@Slf4j
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final UserService userService;
-    private final JwtTokenProvider tokenProvider;
-
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        loginRequest.getEmail(),
-                        loginRequest.getPassword()
-                )
-        );
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+        // Placeholder response
+        log.info("Received login request: username={}, password={}", loginRequest.getUsername(), loginRequest.getPassword());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        User user = userService.getCurrentUser();
-        
-        return ResponseEntity.ok(new AuthResponse(jwt, UserDTO.fromUser(user)));
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Login successful");
+
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        User user = userService.createUser(registerRequest);
-        
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        registerRequest.getEmail(),
-                        registerRequest.getPassword()
-                )
-        );
+    public ResponseEntity<Map<String, Object>> register(@RequestBody RegisterRequest registerRequest) {
+        // Placeholder response
+        log.info("Received register request: username={}, password={}, email={}", registerRequest.getUsername(),
+                registerRequest.getPassword(), registerRequest.getEmail());
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = tokenProvider.generateToken(authentication);
-        
-        return ResponseEntity.ok(new AuthResponse(jwt, UserDTO.fromUser(user)));
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "Registration successful");
+
+        return ResponseEntity.ok(response);
     }
 }

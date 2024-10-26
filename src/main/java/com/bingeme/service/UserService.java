@@ -16,7 +16,6 @@ import java.util.Map;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final FileStorageService fileStorageService;
 
     public User createUser(RegisterRequest request) {
@@ -25,9 +24,9 @@ public class UserService {
         }
 
         User user = new User();
-        user.setName(request.getName());
+        user.setName(request.getUsername());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(request.getPassword());
 
         return userRepository.save(user);
     }
